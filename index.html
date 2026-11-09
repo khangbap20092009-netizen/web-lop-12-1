@@ -165,7 +165,7 @@
         </div>
     </div>
 
-    <!-- NỘI DUNG CHÍNH (ÉP XUỐNG ĐỂ KHOE ẢNH LỚP MẶT SAU) -->
+    <!-- NỘI DUNG CHÍNH -->
     <main class="max-w-5xl mx-auto px-4 mt-[35vh] w-full relative z-30 pb-20">
         <div id="loadingOverlay" class="absolute inset-0 glass-card z-50 flex flex-col items-center justify-start pt-16 hidden rounded-3xl">
             <div class="loader mb-3 border-t-[#10b981]"></div><p class="text-emerald-800 font-bold text-lg animate-pulse tracking-wide drop-shadow-md">Đang đồng bộ dữ liệu...</p>
@@ -178,10 +178,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <input type="text" id="examTitle" placeholder="Tên đề thi..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-gray-900 shadow-inner">
                     <input type="url" id="examPdf" placeholder="Link PDF Đề thi..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-gray-900 shadow-inner">
-                    <input type="text" id="examAns" placeholder="Đáp án (VD: 1A 2B 3C...)" class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-mono font-bold text-gray-900 shadow-inner">
+                    <input type="text" id="examAns" placeholder="Đáp án (VD: 1A 2B 3DDSD 412.5 5TL-200)..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-mono font-bold text-gray-900 shadow-inner">
                     <input type="number" id="examTime" placeholder="Thời gian (Phút)..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-gray-900 shadow-inner">
                     <input type="text" id="examSubject" placeholder="Tên môn học..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-gray-900 shadow-inner">
                     <input type="text" id="examTeacher" placeholder="Giáo viên ra đề..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-gray-900 shadow-inner">
+                    <input type="number" id="examMaxExits" placeholder="Giới hạn thoát màn hình (0 = Không giới hạn)..." class="w-full px-4 py-2.5 bg-white/70 border border-white rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-gray-900 shadow-inner col-span-1 md:col-span-2">
                 </div>
                 <button onclick="addExam()" class="bg-emerald-600/90 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg transition border border-emerald-400">Tạo Đề Thi</button>
             </div>
@@ -228,14 +229,26 @@
                 </div>
             </div>
 
+            <!-- BẢNG ĐIỂM CHO GIÁO VIÊN -->
             <div id="adminDashboard" class="admin-col hidden">
-                <div class="glass-card border-l-4 border-l-blue-500 p-6 rounded-3xl text-center shadow-xl mb-6">
+                <div class="glass-card border-l-4 border-l-blue-500 p-6 rounded-3xl text-center shadow-xl mb-6 flex flex-col items-center">
                     <h3 class="text-blue-900 font-bold text-sm uppercase tracking-wider mb-2 drop-shadow-sm">📊 Điểm Trung Bình Cả Lớp</h3>
                     <p class="text-5xl font-black text-blue-700 drop-shadow-lg" id="classAverageScore">0.00</p>
+                    <button onclick="deleteAllScores()" class="mt-4 bg-red-500/90 hover:bg-red-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition text-sm border border-red-300">
+                        <i class="fas fa-trash-alt mr-2"></i> Xóa Tất Cả Điểm Thi
+                    </button>
                 </div>
-                <div class="glass-card rounded-3xl shadow-xl overflow-hidden border border-white">
-                    <table class="w-full text-left border-collapse">
-                        <thead><tr class="bg-white/60 text-gray-900 text-sm uppercase tracking-wider border-b border-white"><th class="px-6 py-4 font-black">Học Sinh</th><th class="px-6 py-4 font-black">Bài Thi</th><th class="px-6 py-4 font-black text-center">Điểm</th><th class="px-6 py-4 font-black text-center">Xóa</th></tr></thead>
+                <div class="glass-card rounded-3xl shadow-xl overflow-x-auto border border-white">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-white/60 text-gray-900 text-sm uppercase tracking-wider border-b border-white">
+                                <th class="px-6 py-4 font-black">Học Sinh</th>
+                                <th class="px-6 py-4 font-black">Bài Thi</th>
+                                <th class="px-6 py-4 font-black text-center">Điểm</th>
+                                <th class="px-6 py-4 font-black text-center">Thoát Tab</th>
+                                <th class="px-6 py-4 font-black text-center">Xóa</th>
+                            </tr>
+                        </thead>
                         <tbody id="scoresTableBodyAdmin" class="divide-y divide-white/60"></tbody>
                     </table>
                 </div>
@@ -244,6 +257,12 @@
 
         <!-- SECTION 4: NHẬT KÝ -->
         <div id="section-logs" class="hidden"> 
+            <div class="admin-col hidden mb-4 flex justify-end">
+                <button onclick="deleteAllLogs()" class="bg-red-500/90 hover:bg-red-600 text-white font-bold py-2 px-5 rounded-xl shadow-md transition text-sm border border-red-300">
+                    <i class="fas fa-trash-alt mr-2"></i> Xóa Tất Cả Nhật Ký
+                </button>
+            </div>
+            
             <div class="glass-card rounded-3xl shadow-xl border-l-4 border-l-orange-500 overflow-hidden border border-white">
                 <table class="w-full text-left border-collapse">
                     <thead><tr class="bg-white/60 text-orange-900 text-sm uppercase tracking-wider border-b border-white"><th class="px-6 py-4 font-black w-1/4">Thời Gian</th><th class="px-6 py-4 font-black w-1/3">Học Sinh</th><th class="px-6 py-4 font-black">Hoạt Động</th></tr></thead>
@@ -267,35 +286,62 @@
     </main>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzixTF7TtyCVFe-UeIoCzQVHNJGxdSPwqC_BqN3xpPayeuiEF0yqfO5bV8CiZit-Xtelw/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwni0Ptz3izsFMFrGB0W6KrTVN2go_P4ex0mYIRjp_6voY6WfenjITgZ_0rpsow-7nREQ/exec';
         
         let systemConfig = { viewPass: "12/1", adminPass: "17042009", examDate: "2027-06-25" };
         let currentUser = localStorage.getItem('class121_StudentName') || '';
         let savedPass = localStorage.getItem('class121_SavedPass') || '';
         let isAdmin = false;
-        let chartInstance = null; 
-        let countdownInterval = null;
-        
+        let chartInstance = null; let countdownInterval = null;
         let exams = [], scores = [], documents = [], students = [], logs = [];
         let currentExam = null, timerInterval = null, examAnswers = [], userAnswers = [], isReviewMode = false; 
+        let currentExitCount = 0, currentMaxExits = 0;
 
         window.onload = () => { document.getElementById('welcomeModal').classList.remove('hidden'); fetchSystemData(); };
-
-        function formatDateForDisplay(dateString) {
-            if (!dateString) return "";
-            const parts = dateString.split("-");
-            if (parts.length !== 3) return dateString;
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
-        }
         
-        function parseDateInput(dateInput) {
-            if (!dateInput) return "";
-            const parts = dateInput.split(/[\/\-]/);
-            if (parts.length !== 3) return dateInput;
-            if (parts[2].length === 4) {
-                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        document.addEventListener("visibilitychange", () => {
+            const examRoom = document.getElementById('section-exam-room');
+            if (document.hidden && currentExam && !isReviewMode && !examRoom.classList.contains('hidden')) {
+                currentExitCount++;
+                if (currentMaxExits > 0 && currentExitCount > currentMaxExits) {
+                    alert(`🚨 ĐÌNH CHỈ THI 🚨\nThoát Tab ${currentExitCount} lần (Vượt ${currentMaxExits} lần).\nĐã tự động thu bài!`);
+                    submitExam(true);
+                } else {
+                    let msg = `⚠️ CẢNH BÁO (Lần ${currentExitCount}) ⚠️\nBạn vừa chuyển Tab!`;
+                    if (currentMaxExits > 0) msg += `\nQuá ${currentMaxExits} lần sẽ tự động nộp bài.`;
+                    alert(msg);
+                }
             }
-            return dateInput;
+        });
+
+        // BỘ NÃO AI PHÂN TÍCH ĐÁP ÁN
+        function parseAnsString(str) {
+            let res = [];
+            let tokens = str.trim().split(/\s+/);
+            tokens.forEach(tok => {
+                let cleanAns = tok.toUpperCase().replace(/(TF\-|TL\-)/g, '-'); 
+                
+                if (/^\d+[A-D]$/.test(cleanAns)) {
+                    cleanAns = cleanAns.slice(-1);
+                } else if (/^\d+[DS]{4}$/.test(cleanAns)) {
+                    cleanAns = cleanAns.slice(-4);
+                } 
+                else if (/^\d+[\:\-\)](.+)$/.test(cleanAns)) {
+                    cleanAns = cleanAns.match(/^\d+[\:\-\)](.+)$/)[1];
+                }
+                else if (/^\d+\.([^0-9]+)$/.test(cleanAns)) {
+                    cleanAns = cleanAns.match(/^\d+\.([^0-9]+)$/)[1];
+                }
+
+                if (/^[A-D]$/.test(cleanAns)) {
+                    res.push({ type: 'MCQ', ans: cleanAns }); 
+                } else if (/^[DS]{4}$/.test(cleanAns)) {
+                    res.push({ type: 'TF', ans: cleanAns.split('') }); 
+                } else if (cleanAns !== "") {
+                    res.push({ type: 'SA', ans: cleanAns.substring(0, 4) }); 
+                }
+            });
+            return res;
         }
 
         function startCountdown() {
@@ -351,6 +397,7 @@
             }, 1000);
         }
 
+        // HÀM TẢI DỮ LIỆU ĐÃ ĐƯỢC CHỈNH SỬA
         function fetchSystemData() {
             const freshUrl = SCRIPT_URL + "?t=" + new Date().getTime();
             fetch(freshUrl).then(r => {
@@ -367,12 +414,20 @@
                 if(data.documents) documents = data.documents;
                 
                 startCountdown();
-                
                 unlockLoginForm();
+                
                 if (currentUser && savedPass) {
-                    if (savedPass === systemConfig.viewPass || savedPass === systemConfig.adminPass) {
-                        if (savedPass === systemConfig.adminPass) isAdmin = true; initApp(); 
-                    } else { logout(); alert("Bảo mật: Mật khẩu lớp học đã thay đổi. Vui lòng đăng nhập lại!"); }
+                    const sView = String(systemConfig.viewPass).trim();
+                    const sAdmin = String(systemConfig.adminPass).trim();
+                    const sSaved = String(savedPass).trim();
+                    
+                    if (sSaved === sView || sSaved === sAdmin) {
+                        if (sSaved === sAdmin) isAdmin = true; 
+                        initApp(); 
+                    } else { 
+                        logout(); 
+                        alert(`Bảo mật: Mật khẩu lớp đã thay đổi.\nBạn đang lưu mật khẩu: "${sSaved}"\nMáy chủ yêu cầu mật khẩu: "${sAdmin}"\n\nVui lòng đăng nhập lại!`); 
+                    }
                 }
             }).catch((err) => { 
                 document.getElementById('loginStatusText').innerHTML = `<span class="text-red-700 font-black bg-white/90 px-3 py-1.5 rounded-lg shadow-md border border-red-200">Lỗi Kết Nối! Kiểm tra Link Google.</span>`;
@@ -389,17 +444,34 @@
             btn.disabled = false; btn.innerText = "Vào Lớp Học"; btn.className = "w-full bg-emerald-600/90 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg hover:-translate-y-0.5 border border-emerald-400";
         }
 
+        // HÀM ĐĂNG NHẬP VỚI CÔNG NGHỆ BẮT BỆNH MẬT KHẨU
         function loginStudent() {
-            const name = document.getElementById('studentNameLogin').value.trim(); const pass = document.getElementById('classPasswordLogin').value.trim();
+            const name = document.getElementById('studentNameLogin').value.trim(); 
+            const pass = document.getElementById('classPasswordLogin').value.trim();
             const err = document.getElementById('loginError');
             if (!name) return alert('Vui lòng điền họ tên của bạn!');
-            if (students.length > 0 && pass !== systemConfig.adminPass) {
-                const isValidName = students.some(s => s.toLowerCase() === name.toLowerCase());
-                if(!isValidName) { err.innerText = "Tên của bạn không có trong danh sách lớp 12/1!"; err.classList.remove('hidden'); return; }
+            
+            const serverView = String(systemConfig.viewPass).trim();
+            const serverAdmin = String(systemConfig.adminPass).trim();
+            const userPass = String(pass).trim();
+
+            if (userPass !== serverView && userPass !== serverAdmin) { 
+                err.innerText = `Sai mật khẩu! (Lưu ý: Mật khẩu máy chủ đang nhận là: "${serverAdmin}")`; 
+                err.classList.remove('hidden'); 
+                return; 
             }
-            if (pass !== systemConfig.viewPass && pass !== systemConfig.adminPass) { err.innerText = "Sai mật khẩu, vui lòng thử lại!"; err.classList.remove('hidden'); return; }
-            currentUser = name; localStorage.setItem('class121_StudentName', currentUser); localStorage.setItem('class121_SavedPass', pass);
-            if (pass === systemConfig.adminPass) isAdmin = true; initApp();
+
+            if (students.length > 0 && userPass !== serverAdmin) {
+                if(!students.some(s => s.toLowerCase() === name.toLowerCase())) { 
+                    err.innerText = "Tên của bạn không có trong danh sách lớp 12/1!"; 
+                    err.classList.remove('hidden'); 
+                    return; 
+                }
+            }
+            
+            currentUser = name; localStorage.setItem('class121_StudentName', currentUser); localStorage.setItem('class121_SavedPass', userPass);
+            if (userPass === serverAdmin) isAdmin = true; 
+            initApp();
         }
 
         function logout() { localStorage.clear(); location.reload(); }
@@ -412,41 +484,82 @@
         }
 
         function startExam(id) {
-            const exam = exams.find(e => e.id === id);
-            if(!exam) return;
-            const existingScore = scores.find(s => s.name.toLowerCase() === currentUser.toLowerCase() && s.exam === exam.title);
-            if(existingScore && !isAdmin) {
-                const wantToRetake = confirm(`💡 Kỷ lục hiện tại của bạn là: ${existingScore.score} điểm.\nBạn có muốn thi lại để phá kỷ lục không?`);
-                if(!wantToRetake) return;
-            }
-            examAnswers = exam.ans.toUpperCase().match(/[A-D]/g); 
-            if(!examAnswers) return alert("Lỗi: Giáo viên chưa nhập chuỗi đáp án hợp lệ!");
-            isReviewMode = false; currentExam = exam; userAnswers = new Array(examAnswers.length).fill(null); 
+            const exam = exams.find(e => String(e.id) === String(id));
+            if(!exam) { alert("Không tìm thấy đề thi này trong hệ thống!"); return; }
+            const parts = exam.ans.split("||");
+            examAnswers = parseAnsString(parts[0]); 
+            if(examAnswers.length === 0) return alert("Lỗi: Đề thi không có đáp án hợp lệ!");
+
+            currentMaxExits = parseInt(parts[1]) || 0; currentExitCount = 0;
+            const existScore = scores.find(s => s.name.toLowerCase() === currentUser.toLowerCase() && s.exam === exam.title);
+            if(existScore && !isAdmin) { if(!confirm(`💡 Kỷ lục của bạn: ${existScore.score} điểm.\nMuốn thi lại để phá kỷ lục không?`)) return; }
+            
+            isReviewMode = false; currentExam = exam; 
+            
+            userAnswers = examAnswers.map(q => {
+                if (q.type === 'TF') return [null, null, null, null];
+                if (q.type === 'SA') return '';
+                return null; 
+            });
+            
             document.getElementById('examRoomTitle').innerText = exam.title;
-            let embedUrl = exam.pdf; if(embedUrl.includes('/view')) embedUrl = embedUrl.replace('/view', '/preview');
-            document.getElementById('examIframe').src = embedUrl;
+            document.getElementById('examIframe').src = exam.pdf.includes('/view') ? exam.pdf.replace('/view', '/preview') : exam.pdf;
             document.getElementById('timerContainer').classList.remove('hidden'); document.getElementById('submitBtnContainer').classList.remove('hidden'); document.getElementById('reviewFilterBar').classList.add('hidden'); 
             
             const bubbleSheet = document.getElementById('bubbleSheet');
-            bubbleSheet.innerHTML = examAnswers.map((ans, i) => `
-                <div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200 hover:border-emerald-300 transition mb-3">
-                    <span class="font-bold text-gray-700 w-16 whitespace-nowrap">Câu ${i+1}</span>
-                    <div class="flex space-x-2">
-                        ${['A','B','C','D'].map(opt => `<button onclick="selectAnswer(${i}, '${opt}')" id="btn_ans_${i}_${opt}" class="ans-btn w-10 h-10 rounded-full border-2 border-gray-300 font-bold text-gray-500 hover:border-emerald-400 hover:text-emerald-600 transition focus:outline-none">${opt}</button>`).join('')}
-                    </div>
-                </div>
-            `).join('');
+            bubbleSheet.innerHTML = examAnswers.map((q, i) => {
+                if (q.type === 'MCQ') {
+                    return `<div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
+                        <span class="font-bold text-gray-700 w-20">Câu ${i+1}</span>
+                        <div class="flex space-x-2">
+                            ${['A','B','C','D'].map(opt => `<button onclick="selectMCQ(${i}, '${opt}')" id="btn_ans_${i}_${opt}" class="w-10 h-10 rounded-full border-2 border-gray-300 font-bold text-gray-500 hover:border-emerald-400 focus:outline-none transition">${opt}</button>`).join('')}
+                        </div>
+                    </div>`;
+                } else if (q.type === 'TF') {
+                    return `<div class="flex flex-col bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
+                        <span class="font-bold text-gray-700 mb-2 border-b pb-1">Câu ${i+1} (Đúng/Sai)</span>
+                        ${['a','b','c','d'].map((item, subIdx) => `
+                            <div class="flex items-center justify-between pl-2 mb-1.5">
+                                <span class="font-bold text-gray-600">Ý ${item})</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="selectTF(${i}, ${subIdx}, 'D')" id="btn_tf_${i}_${subIdx}_D" class="w-9 h-9 rounded border-2 border-gray-300 font-bold text-gray-500 hover:border-emerald-400 focus:outline-none transition">Đ</button>
+                                    <button onclick="selectTF(${i}, ${subIdx}, 'S')" id="btn_tf_${i}_${subIdx}_S" class="w-9 h-9 rounded border-2 border-gray-300 font-bold text-gray-500 hover:border-red-400 focus:outline-none transition">S</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                } else if (q.type === 'SA') {
+                    return `<div class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
+                        <span class="font-bold text-gray-700 w-24">Câu ${i+1} (Ngắn)</span>
+                        <input type="text" maxlength="4" oninput="inputSA(${i}, this.value)" id="input_sa_${i}" placeholder="VD: 12.5" class="w-24 px-2 py-2 border-2 border-gray-300 rounded-lg font-bold text-center text-blue-700 focus:border-emerald-500 outline-none uppercase shadow-inner">
+                    </div>`;
+                }
+            }).join('');
 
             document.getElementById('section-exam-room').classList.remove('hidden'); document.body.classList.add('overflow-hidden');
             sendToGoogle({ type: 'log_action', name: currentUser, action: `Bắt đầu thi: ${exam.title}` });
             startTimer(exam.time * 60);
         }
 
-        function selectAnswer(qIndex, option) {
+        function selectMCQ(qIndex, option) {
             if(isReviewMode) return;
             userAnswers[qIndex] = option;
-            ['A','B','C','D'].forEach(opt => { document.getElementById(`btn_ans_${qIndex}_${opt}`).classList.remove('active'); });
-            document.getElementById(`btn_ans_${qIndex}_${option}`).classList.add('active');
+            ['A','B','C','D'].forEach(opt => document.getElementById(`btn_ans_${qIndex}_${opt}`).classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500', 'transform', 'scale-110'));
+            const btn = document.getElementById(`btn_ans_${qIndex}_${option}`);
+            btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500', 'transform', 'scale-110');
+        }
+        function selectTF(qIndex, subIndex, val) {
+            if(isReviewMode) return;
+            userAnswers[qIndex][subIndex] = val;
+            document.getElementById(`btn_tf_${qIndex}_${subIndex}_D`).classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+            document.getElementById(`btn_tf_${qIndex}_${subIndex}_S`).classList.remove('bg-red-500', 'text-white', 'border-red-500');
+            
+            if (val === 'D') document.getElementById(`btn_tf_${qIndex}_${subIndex}_D`).classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+            if (val === 'S') document.getElementById(`btn_tf_${qIndex}_${subIndex}_S`).classList.add('bg-red-500', 'text-white', 'border-red-500');
+        }
+        function inputSA(qIndex, val) {
+            if(isReviewMode) return;
+            userAnswers[qIndex] = val.trim();
         }
 
         function startTimer(duration) {
@@ -468,68 +581,117 @@
         }
 
         function submitExam(isAuto = false) {
-            if(!isAuto && !confirm("Bạn đã kiểm tra kỹ và muốn Nộp Bài?")) return;
+            if(!isAuto && !confirm("Chắc chắn Nộp Bài?")) return;
             clearInterval(timerInterval);
-            let correctCount = 0;
-            for(let i=0; i<examAnswers.length; i++) { if(userAnswers[i] === examAnswers[i]) correctCount++; }
-            let finalScore = parseFloat(((correctCount / examAnswers.length) * 10).toFixed(2));
-            let detailJson = JSON.stringify(userAnswers);
+            
+            let totalEarned = 0; let maxPossible = examAnswers.length; 
+            
+            for(let i=0; i<examAnswers.length; i++) {
+                let cAns = examAnswers[i].ans;
+                let uAns = userAnswers[i];
+                
+                if(examAnswers[i].type === 'MCQ') {
+                    if(uAns === cAns) totalEarned += 1;
+                } 
+                else if (examAnswers[i].type === 'TF') {
+                    let match = 0;
+                    for(let j=0; j<4; j++) { if(uAns && uAns[j] === cAns[j]) match++; }
+                    if(match === 1) totalEarned += 0.1;
+                    else if(match === 2) totalEarned += 0.25;
+                    else if(match === 3) totalEarned += 0.5;
+                    else if(match === 4) totalEarned += 1.0;
+                } 
+                else if (examAnswers[i].type === 'SA') {
+                    if(uAns && cAns && String(uAns).toUpperCase() === String(cAns).toUpperCase()) totalEarned += 1;
+                }
+            }
+            
+            let finalScore = parseFloat(((totalEarned / maxPossible) * 10).toFixed(2));
+            
+            let detailObj = { ans: userAnswers, exits: currentExitCount };
+            let detailJson = JSON.stringify(detailObj);
 
-            const existingIndex = scores.findIndex(s => s.name.toLowerCase() === currentUser.toLowerCase() && s.exam === currentExam.title);
-            if (existingIndex !== -1) {
-                if (finalScore > scores[existingIndex].score) {
-                    alert(`🎉 XUẤT SẮC! PHÁ KỶ LỤC!\n\nSố câu đúng: ${correctCount}/${examAnswers.length}\nĐiểm kỷ lục mới: ${finalScore} (Kỷ lục cũ: ${scores[existingIndex].score})`);
-                    scores[existingIndex].score = finalScore;
-                    scores[existingIndex].detail = detailJson; 
-                } else alert(`👍 HOÀN THÀNH BÀI THI!\n\nĐiểm của bạn: ${finalScore} (Chưa vượt kỷ lục cũ ${scores[existingIndex].score}).`);
+            const eIdx = scores.findIndex(s => s.name.toLowerCase() === currentUser.toLowerCase() && s.exam === currentExam.title);
+            if (eIdx !== -1) {
+                if (finalScore > scores[eIdx].score) {
+                    alert(`🎉 PHÁ KỶ LỤC!\nĐiểm mới: ${finalScore} (Cũ: ${scores[eIdx].score})\nThoát Tab: ${currentExitCount} lần`);
+                    scores[eIdx].score = finalScore; scores[eIdx].detail = detailJson; 
+                } else alert(`👍 HOÀN THÀNH!\nĐiểm: ${finalScore}\nThoát Tab: ${currentExitCount} lần`);
             } else {
-                alert(`🎉 HOÀN THÀNH BÀI THI!\n\nSố câu đúng: ${correctCount}/${examAnswers.length}\nĐiểm số: ${finalScore} điểm`);
+                alert(`🎉 HOÀN THÀNH!\nĐiểm: ${finalScore}\nThoát Tab: ${currentExitCount} lần`);
                 scores.push({ id: Date.now().toString(), name: currentUser, exam: currentExam.title, score: finalScore, detail: detailJson });
             }
             
             document.getElementById('section-exam-room').classList.add('hidden'); document.getElementById('examIframe').src = ""; document.body.classList.remove('overflow-hidden');
             renderScores(); 
             sendToGoogle({ type: 'add_score', id: Date.now().toString(), name: currentUser, exam: currentExam.title, score: finalScore, detail: detailJson });
-            sendToGoogle({ type: 'log_action', name: currentUser, action: `Nộp bài: ${currentExam.title} - ${finalScore} Điểm` });
+            sendToGoogle({ type: 'log_action', name: currentUser, action: `Nộp bài: ${currentExam.title} - ${finalScore}đ (Thoát: ${currentExitCount})` });
             switchTab('leaderboard');
         }
 
         function reviewExam(scoreId) {
             const scoreObj = scores.find(s => s.id === scoreId);
             const exam = exams.find(e => e.title === scoreObj.exam);
-            if(!exam || !scoreObj.detail) return alert("Không tìm thấy dữ liệu gốc để xem lại!");
+            if(!exam || !scoreObj.detail) return alert("Không tìm thấy dữ liệu gốc!");
 
-            isReviewMode = true; examAnswers = exam.ans.toUpperCase().match(/[A-D]/g); 
-            try { userAnswers = JSON.parse(scoreObj.detail); } catch(e) { userAnswers = []; }
+            isReviewMode = true; 
+            const parts = exam.ans.split("||");
+            examAnswers = parseAnsString(parts[0]); 
+            
+            try { 
+                let parsed = JSON.parse(scoreObj.detail); 
+                userAnswers = (Array.isArray(parsed)) ? parsed : (parsed.ans || []);
+            } catch(e) { userAnswers = []; }
             
             document.getElementById('examRoomTitle').innerText = `XEM LẠI: ${exam.title} - ${scoreObj.score} Điểm`;
-            let embedUrl = exam.pdf; if(embedUrl.includes('/view')) embedUrl = embedUrl.replace('/view', '/preview');
-            document.getElementById('examIframe').src = embedUrl;
+            document.getElementById('examIframe').src = exam.pdf.includes('/view') ? exam.pdf.replace('/view', '/preview') : exam.pdf;
             
-            document.getElementById('timerContainer').classList.add('hidden');
-            document.getElementById('submitBtnContainer').classList.add('hidden');
+            document.getElementById('timerContainer').classList.add('hidden'); document.getElementById('submitBtnContainer').classList.add('hidden');
             document.getElementById('reviewFilterBar').classList.remove('hidden'); 
 
             let countCorrect = 0; let countWrong = 0;
             const bubbleSheet = document.getElementById('bubbleSheet');
             
-            bubbleSheet.innerHTML = examAnswers.map((correctOpt, i) => {
-                const userOpt = userAnswers[i];
-                const isCorrect = (userOpt === correctOpt);
-                if(isCorrect) countCorrect++; else countWrong++;
-                const statusClass = isCorrect ? 'review-item-correct' : 'review-item-wrong';
-                
-                return `<div class="review-item ${statusClass} flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
-                    <span class="font-bold text-gray-700 w-16 whitespace-nowrap">Câu ${i+1}</span>
-                    <div class="flex space-x-2">
-                        ${['A','B','C','D'].map(opt => {
-                            let extraClass = "bg-gray-50 text-gray-400 border-gray-200 opacity-50 cursor-not-allowed"; 
-                            if(opt === correctOpt) extraClass = "ans-correct"; 
-                            else if(opt === userOpt && userOpt !== correctOpt) extraClass = "ans-wrong"; 
-                            return `<button disabled class="w-10 h-10 rounded-full border-2 font-bold flex items-center justify-center ${extraClass}">${opt}</button>`;
+            bubbleSheet.innerHTML = examAnswers.map((q, i) => {
+                if (q.type === 'MCQ') {
+                    let isCorr = (userAnswers[i] === q.ans);
+                    if(isCorr) countCorrect++; else countWrong++;
+                    return `<div class="review-item ${isCorr?'review-item-correct':'review-item-wrong'} flex items-center justify-between bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
+                        <span class="font-bold text-gray-700 w-20">Câu ${i+1}</span>
+                        <div class="flex space-x-2">
+                            ${['A','B','C','D'].map(opt => {
+                                let cClass = "bg-gray-50 text-gray-400 opacity-50"; 
+                                if(opt === q.ans) cClass = "bg-emerald-500 text-white border-emerald-500"; 
+                                else if(opt === userAnswers[i]) cClass = "bg-red-500 text-white border-red-500"; 
+                                return `<button disabled class="w-10 h-10 rounded-full border-2 font-bold ${cClass}">${opt}</button>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                } else if (q.type === 'TF') {
+                    let match = 0;
+                    for(let j=0; j<4; j++) { if(userAnswers[i] && userAnswers[i][j] === q.ans[j]) match++; }
+                    if(match===4) countCorrect++; else countWrong++;
+                    return `<div class="review-item ${match===4?'review-item-correct':'review-item-wrong'} flex flex-col bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
+                        <span class="font-bold text-gray-700 mb-2 border-b pb-1">Câu ${i+1} (Đúng/Sai)</span>
+                        ${['a','b','c','d'].map((item, subIdx) => {
+                            let cAns = q.ans[subIdx], uAns = userAnswers[i] ? userAnswers[i][subIdx] : null;
+                            let bd = (cAns==='D')?'bg-emerald-500 text-white border-emerald-500':(uAns==='D'?'bg-red-500 text-white border-red-500':'bg-gray-50 text-gray-400 opacity-50');
+                            let bs = (cAns==='S')?'bg-emerald-500 text-white border-emerald-500':(uAns==='S'?'bg-red-500 text-white border-red-500':'bg-gray-50 text-gray-400 opacity-50');
+                            return `<div class="flex items-center justify-between pl-2 mb-1.5"><span class="font-bold text-gray-600">Ý ${item})</span><div class="flex space-x-2"><button disabled class="w-9 h-9 rounded border-2 font-bold ${bd}">Đ</button><button disabled class="w-9 h-9 rounded border-2 font-bold ${bs}">S</button></div></div>`;
                         }).join('')}
-                    </div>
-                </div>`;
+                    </div>`;
+                } else if (q.type === 'SA') {
+                    let isCorr = (userAnswers[i]||'').toString().toUpperCase() === q.ans.toString().toUpperCase();
+                    if(isCorr) countCorrect++; else countWrong++;
+                    let bClass = isCorr ? 'border-emerald-500 text-emerald-700 bg-emerald-50' : 'border-red-500 text-red-700 bg-red-50';
+                    return `<div class="review-item ${isCorr?'review-item-correct':'review-item-wrong'} flex flex-col bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-gray-700">Câu ${i+1} (Ngắn)</span>
+                            <input type="text" disabled value="${userAnswers[i]||''}" class="w-24 px-2 py-2 border-2 ${bClass} rounded-lg font-bold text-center">
+                        </div>
+                        ${!isCorr ? `<div class="text-right mt-1.5 text-sm font-bold text-emerald-600 border-t pt-1">Đ.Án đúng: ${q.ans}</div>` : ''}
+                    </div>`;
+                }
             }).join('');
 
             document.getElementById('countCorrect').innerText = countCorrect;
@@ -612,7 +774,17 @@
         }
 
         function handleRoleToggle(checkbox) { if (checkbox.checked) { checkbox.checked = false; document.getElementById('adminModal').classList.remove('hidden'); } else { isAdmin = false; updateRoleUI(); switchTab('exams'); } }
-        function verifyAdmin() { if (document.getElementById('adminPasswordCheck').value === systemConfig.adminPass) { isAdmin = true; document.getElementById('roleToggle').checked = true; closeAdminModal(); updateRoleUI(); } else document.getElementById('adminError').classList.remove('hidden'); }
+        
+        function verifyAdmin() { 
+            const inputPass = String(document.getElementById('adminPasswordCheck').value).trim();
+            const sysPass = String(systemConfig.adminPass).trim();
+            if (inputPass === sysPass) { 
+                isAdmin = true; document.getElementById('roleToggle').checked = true; closeAdminModal(); updateRoleUI(); 
+            } else { 
+                document.getElementById('adminError').classList.remove('hidden'); 
+            } 
+        }
+        
         function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); document.getElementById('adminPasswordCheck').value = ''; }
         
         function updateRoleUI() {
@@ -648,21 +820,24 @@
         }
 
         function updateSettings() {
-            const v = document.getElementById('settingViewPass').value.trim(); 
-            const a = document.getElementById('settingAdminPass').value.trim();
             const dateInput = document.getElementById('settingExamDate').value.trim();
-            const e = parseDateInput(dateInput);
+            let eStr = dateInput;
+            let pts = dateInput.split(/[\/\-]/); if(pts.length === 3 && pts[2].length === 4) eStr = `${pts[2]}-${pts[1]}-${pts[0]}`;
             
             if(confirm("Lưu cài đặt hệ thống?")) { 
+                const v = String(document.getElementById('settingViewPass').value).trim(); 
+                const a = String(document.getElementById('settingAdminPass').value).trim();
+                
                 systemConfig.viewPass = v; 
                 systemConfig.adminPass = a; 
-                systemConfig.examDate = e;
+                systemConfig.examDate = eStr;
+                
                 localStorage.setItem('class121_SavedPass', a); 
                 fetch(SCRIPT_URL, { 
                     method: 'POST', 
-                    body: JSON.stringify({ type: 'update_settings', viewPass: v, adminPass: a, examDate: e }) 
+                    body: JSON.stringify({ type: 'update_settings', viewPass: v, adminPass: a, examDate: eStr }) 
                 }).then(() => {
-                    alert("Đã cập nhật hệ thống!");
+                    alert("Đã cập nhật hệ thống lên Máy chủ thành công!");
                     startCountdown(); 
                 }); 
             }
@@ -675,25 +850,30 @@
             if (exams.length === 0) {
                 return container.innerHTML = `<div class="col-span-2 text-center py-20"><span class="glass-pill px-6 py-3 rounded-full text-gray-900 font-bold shadow-md"><i class="fas fa-box-open mr-2"></i>Hiện tại chưa có đề thi nào.</span></div>`;
             }
-            container.innerHTML = exams.map((item) => `
-                <div class="glass-card p-6 rounded-3xl shadow-lg relative hover:shadow-xl hover:-translate-y-1 transition duration-300">
+            container.innerHTML = exams.map((item) => {
+                const parts = item.ans.split("||");
+                const showExits = parts[1] && parseInt(parts[1]) > 0 ? `<span class="text-[10px] font-black uppercase bg-red-100/90 text-red-800 px-2 py-1 rounded border border-red-200 ml-2"><i class="fas fa-eye-slash mr-1"></i>Tối đa ${parts[1]} lần thoát</span>` : '';
+                
+                return `<div class="glass-card p-6 rounded-3xl shadow-lg relative hover:shadow-xl hover:-translate-y-1 transition duration-300">
                     ${isAdmin ? `<button onclick="deleteExam('${item.id}')" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 bg-white/90 rounded-full p-2 shadow-md"><i class="fas fa-trash"></i></button>` : ''}
-                    <div class="mb-4 flex space-x-2">
+                    <div class="mb-4 flex items-center flex-wrap gap-2">
                         <span class="text-xs font-black uppercase tracking-wider px-3 py-1.5 bg-emerald-100/90 text-emerald-900 rounded-lg border border-emerald-300/50 shadow-sm">${item.subject}</span>
                         <span class="text-xs font-black uppercase tracking-wider px-3 py-1.5 bg-blue-100/90 text-blue-900 rounded-lg border border-blue-300/50 shadow-sm"><i class="fas fa-clock mr-1"></i>${item.time} Phút</span>
+                        ${showExits}
                     </div>
                     <h3 class="text-xl font-black text-gray-900 pr-8 mb-2 leading-tight drop-shadow-md">${item.title}</h3>
                     <p class="text-sm font-bold text-gray-800 mb-6"><i class="fas fa-user-edit mr-1 text-gray-700"></i> Giao bởi: ${item.teacher}</p>
                     <button onclick="startExam('${item.id}')" class="w-full text-center bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-black py-3.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition shadow-lg uppercase tracking-wider border border-white/30">Vào Thi Ngay <i class="fas fa-play-circle ml-2"></i></button>
-                </div>`).join('');
+                </div>`
+            }).join('');
         }
 
         function addExam() {
-            const title = document.getElementById('examTitle').value; const pdf = document.getElementById('examPdf').value; const ans = document.getElementById('examAns').value; const time = document.getElementById('examTime').value; const subject = document.getElementById('examSubject').value; const teacher = document.getElementById('examTeacher').value;
+            const title = document.getElementById('examTitle').value; const pdf = document.getElementById('examPdf').value; const ans = document.getElementById('examAns').value; const time = document.getElementById('examTime').value; const subject = document.getElementById('examSubject').value; const teacher = document.getElementById('examTeacher').value; const maxExits = document.getElementById('examMaxExits').value || "0";
             if(!title || !pdf || !ans || !time) return alert("Vui lòng điền đủ thông tin bắt buộc!");
-            const newExam = { id: Date.now().toString(), title: title, pdf: pdf, ans: ans, time: time, subject: subject, teacher: teacher };
+            const newExam = { id: Date.now().toString(), title: title, pdf: pdf, ans: ans + "||" + maxExits, time: time, subject: subject, teacher: teacher };
             exams.unshift(newExam); renderExams(); sendToGoogle({ type: 'add_exam', ...newExam }); 
-            document.getElementById('examTitle').value=''; document.getElementById('examPdf').value=''; document.getElementById('examAns').value=''; document.getElementById('examTime').value='';
+            document.getElementById('examTitle').value=''; document.getElementById('examPdf').value=''; document.getElementById('examAns').value=''; document.getElementById('examTime').value=''; document.getElementById('examMaxExits').value='';
         }
         
         function deleteExam(id) { if(confirm("Xóa đề thi này?")) { exams = exams.filter(e => String(e.id) !== String(id)); renderExams(); sendToGoogle({ type: 'delete_exam', id: id }); } }
@@ -735,13 +915,10 @@
                 let sum = 0; scores.forEach(s => sum += s.score);
                 document.getElementById('classAverageScore').innerText = scores.length ? (sum / scores.length).toFixed(2) : "0.00";
                 
-                document.getElementById('scoresTableBodyAdmin').innerHTML = scores.map(item => `
-                    <tr class="bg-white/60 hover:bg-blue-100/90 transition border-b border-white/50">
-                        <td class="px-6 py-4 font-black text-gray-900">${item.name}</td>
-                        <td class="px-6 py-4 font-bold text-gray-800">${item.exam}</td>
-                        <td class="px-6 py-4 text-center font-black text-2xl text-blue-800">${item.score}</td>
-                        <td class="px-6 py-4 text-center"><button onclick="deleteScore('${item.id}')" class="text-gray-600 hover:text-red-600 bg-white/90 shadow-sm p-2 rounded-full"><i class="fas fa-times-circle"></i></button></td>
-                    </tr>`).join('');
+                document.getElementById('scoresTableBodyAdmin').innerHTML = scores.map(item => {
+                    let exitCount = 0; try { let parsed = JSON.parse(item.detail); if (!Array.isArray(parsed) && parsed.exits !== undefined) exitCount = parsed.exits; } catch(e) {}
+                    return `<tr class="bg-white/60 hover:bg-blue-100/90 transition border-b border-white/50"><td class="px-6 py-4 font-black text-gray-900">${item.name}</td><td class="px-6 py-4 font-bold text-gray-800">${item.exam}</td><td class="px-6 py-4 text-center font-black text-2xl text-blue-800">${item.score}</td><td class="px-6 py-4 text-center font-bold ${exitCount > 0 ? 'text-red-600' : 'text-gray-500'}">${exitCount} lần</td><td class="px-6 py-4 text-center"><button onclick="deleteScore('${item.id}')" class="text-gray-600 hover:text-red-600 bg-white/90 shadow-sm p-2 rounded-full"><i class="fas fa-times-circle"></i></button></td></tr>`
+                }).join('');
             } else {
                 const myScores = scores.filter(s => s.name.toLowerCase() === currentUser.toLowerCase());
                 
@@ -806,6 +983,8 @@
         }
         
         function deleteScore(id) { if(confirm("Xóa điểm?")) { scores = scores.filter(s => String(s.id) !== String(id)); renderScores(); sendToGoogle({ type: 'delete_score', id: id }); } }
+        function deleteAllScores() { if (confirm("⚠️ Xóa TOÀN BỘ lịch sử điểm thi?")) { if (confirm("Lệnh xóa vĩnh viễn! Tiếp tục?")) { scores = []; renderScores(); sendToGoogle({ type: 'delete_all_scores' }); alert("Đã xóa toàn bộ điểm thi!"); } } }
+        function deleteAllLogs() { if (confirm("⚠️ Xóa TOÀN BỘ nhật ký hệ thống?")) { if (confirm("Xác nhận xóa vĩnh viễn?")) { logs = []; renderLogs(); sendToGoogle({ type: 'delete_all_logs' }); alert("Đã xóa toàn bộ nhật ký!"); } } }
     </script>
 </body>
 </html>
